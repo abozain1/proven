@@ -1,4 +1,5 @@
-import obj from "@/assets/task-object.json";
+import useCanvas from "./hook";
 export default function CanvasComponent() {
-  return <canvas></canvas>;
+  const { canvasRef } = useCanvas();
+  return <canvas ref={canvasRef} />;
 }
