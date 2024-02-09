@@ -7,4 +7,4 @@ here are some notes about the task.
 - the points included with each box was not aligning the boxes in a good way and makes it extremely difficult to manage sizes and responsiveness, so i decided to ignore them and use basic index alignment.
   maybe if it was required as if the canvas should show a predefined image from the server, i could negotiate with the backend team to take a different approach
 
-  you can view the task here => ''
+  you can view the task here => https://proven-beta.vercel.app/
