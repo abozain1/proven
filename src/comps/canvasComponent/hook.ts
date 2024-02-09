@@ -17,8 +17,23 @@ const colorMap: ColorMap = {
 
 export default function useCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [boxes, setBoxes] = useState<Box[]>(
+    obj.boxes.map((box, indx) => ({ ...box, id: `id_${Date.now()}_${indx}` }))
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [target, setTarget] = useState<null | Box>(null);
+  function changeBoxHandler(params: Box) {
+    setBoxes((prev) => {
+      const index = prev.findIndex((box) => box.id === params.id);
+      if (index === -1) return prev;
+      const newBoxes = [...prev];
+      newBoxes[index] = { ...newBoxes[index], ...params };
+      return newBoxes;
+    });
+  }
+  function deleteBoxHandler(id: string) {
+    setBoxes((prev) => prev.filter((box) => box.id !== id));
+  }
   const adjustCanvasSize = () => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
@@ -34,7 +49,7 @@ export default function useCanvas() {
           const boxWidth = (canvas.width - (numCols + 1) * gap) / numCols;
           const boxHeight = 50;
 
-          obj.boxes.forEach((box, index) => {
+          boxes.forEach((box, index) => {
             const row = Math.floor(index / numCols);
             const col = index % numCols;
             const x = col * (boxWidth + gap) + gap;
@@ -63,7 +78,7 @@ export default function useCanvas() {
     const boxWidth = (canvas.width - (numCols + 1) * gap) / numCols;
     const boxHeight = 50;
 
-    const clickedBox = obj.boxes.find((box, index) => {
+    const clickedBox = boxes.find((box, index) => {
       const row = Math.floor(index / numCols);
       const col = index % numCols;
       const boxX = col * (boxWidth + gap) + gap;
@@ -94,7 +109,14 @@ export default function useCanvas() {
         canvas.removeEventListener("dblclick", onCanvasDoubleClick);
       }
     };
-  }, []);
+  }, [boxes]);
 
-  return { canvasRef, isModalOpen, setIsModalOpen, target };
+  return {
+    canvasRef,
+    isModalOpen,
+    setIsModalOpen,
+    target,
+    changeBoxHandler,
+    deleteBoxHandler,
+  };
 }
