@@ -31,32 +31,43 @@ export default function useCanvas() {
       return newBoxes;
     });
   }
+  function openModalHandler(box: Box) {
+    setTarget(box);
+    setIsModalOpen(true);
+  }
   function deleteBoxHandler(id: string) {
     setBoxes((prev) => prev.filter((box) => box.id !== id));
   }
   const adjustCanvasSize = () => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const context = canvas.getContext("2d");
-      if (context && canvas.width && canvas.height) {
+    if (canvasRef.current && canvasRef.current.parentElement) {
+      const wrapperWidth = canvasRef.current.parentElement.offsetWidth;
+      const canvasWidth = wrapperWidth * 0.8;
+      const canvasHeight = window.innerHeight;
+
+      canvasRef.current.width = canvasWidth;
+      canvasRef.current.height = canvasHeight;
+
+      const context = canvasRef.current.getContext("2d");
+      if (context) {
         const image = new Image();
         image.onload = () => {
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          const numCols = 4;
+          context.drawImage(image, 0, 0, canvasWidth, canvasHeight);
+
           const gap = 10;
-          const boxWidth = (canvas.width - (numCols + 1) * gap) / numCols;
-          const boxHeight = 50;
+          const staticBoxWidth = 200;
+          const staticBoxHeight = 100;
+          const numCols = Math.floor(
+            (canvasWidth - gap) / (staticBoxWidth + gap)
+          );
 
           boxes.forEach((box, index) => {
             const row = Math.floor(index / numCols);
             const col = index % numCols;
-            const x = col * (boxWidth + gap) + gap;
-            const y = row * (boxHeight + gap) + gap;
+            const x = col * (staticBoxWidth + gap) + gap;
+            const y = row * (staticBoxHeight + gap) + gap;
 
             context.fillStyle = colorMap[box.class];
-            context.fillRect(x, y, boxWidth, boxHeight);
+            context.fillRect(x, y, staticBoxWidth, staticBoxHeight);
             context.fillStyle = "black";
             context.fillText(box.text, x + 10, y + 30);
           });
@@ -90,8 +101,7 @@ export default function useCanvas() {
     });
 
     if (clickedBox) {
-      setIsModalOpen(true);
-      setTarget(clickedBox);
+      openModalHandler(clickedBox);
     }
   };
 
@@ -118,5 +128,7 @@ export default function useCanvas() {
     target,
     changeBoxHandler,
     deleteBoxHandler,
+    boxes,
+    openModalHandler,
   };
 }

@@ -1,5 +1,7 @@
 import useCanvas from "./hook";
 import EditModal from "../modal";
+import Sidebar from "../canvasSideBar";
+import styles from "./styles.module.scss";
 export default function CanvasComponent() {
   const {
     canvasRef,
@@ -8,10 +10,13 @@ export default function CanvasComponent() {
     target,
     changeBoxHandler,
     deleteBoxHandler,
+    openModalHandler,
+    boxes,
   } = useCanvas();
 
   return (
-    <div>
+    <div className={styles.wrapper}>
+      <Sidebar openModal={openModalHandler} boxes={boxes} />
       <canvas ref={canvasRef}></canvas>
       {isModalOpen && target && (
         <EditModal
