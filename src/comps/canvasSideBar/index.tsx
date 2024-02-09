@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@/types";
-
+import styles from "./styles.module.scss";
 interface SidebarProps {
   boxes: Box[];
   openModal: (box: Box) => void;
@@ -17,7 +17,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   const groupedBoxes = groupBoxesByClass(props.boxes);
 
   return (
-    <div style={{ backgroundColor: "wheat", overflow: "hidden" }}>
+    <div className={styles.wrapper}>
       {Object.entries(groupedBoxes).map(([className, boxes]) => (
         <div key={className}>
           <h3>{className}</h3>
