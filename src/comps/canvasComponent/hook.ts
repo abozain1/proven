@@ -1,8 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import obj from "@/assets/task-object.json";
-import { useEffect, useRef } from "react";
+import { Box } from "@/types";
+
 interface ColorMap {
   [key: string]: string;
 }
+
 const colorMap: ColorMap = {
   Name: "red",
   Description: "blue",
@@ -11,9 +14,11 @@ const colorMap: ColorMap = {
   Supplier: "purple",
   Number: "yellow",
 };
+
 export default function useCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [target, setTarget] = useState<null | Box>(null);
   const adjustCanvasSize = () => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
@@ -46,14 +51,50 @@ export default function useCanvas() {
     }
   };
 
+  const onCanvasDoubleClick = (event: MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const numCols = 4;
+    const gap = 10;
+    const boxWidth = (canvas.width - (numCols + 1) * gap) / numCols;
+    const boxHeight = 50;
+
+    const clickedBox = obj.boxes.find((box, index) => {
+      const row = Math.floor(index / numCols);
+      const col = index % numCols;
+      const boxX = col * (boxWidth + gap) + gap;
+      const boxY = row * (boxHeight + gap) + gap;
+
+      return (
+        x >= boxX && x <= boxX + boxWidth && y >= boxY && y <= boxY + boxHeight
+      );
+    });
+
+    if (clickedBox) {
+      setIsModalOpen(true);
+      setTarget(clickedBox);
+    }
+  };
+
   useEffect(() => {
     adjustCanvasSize();
     window.addEventListener("resize", adjustCanvasSize);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.addEventListener("dblclick", onCanvasDoubleClick);
+    }
 
     return () => {
       window.removeEventListener("resize", adjustCanvasSize);
+      if (canvas) {
+        canvas.removeEventListener("dblclick", onCanvasDoubleClick);
+      }
     };
-  }, [obj]);
+  }, []);
 
-  return { canvasRef };
+  return { canvasRef, isModalOpen, setIsModalOpen, target };
 }

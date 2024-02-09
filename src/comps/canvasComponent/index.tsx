@@ -1,7 +1,14 @@
-import styles from "./styles.module.scss";
 import useCanvas from "./hook";
+import EditModal from "../modal";
 export default function CanvasComponent() {
-  const { canvasRef } = useCanvas();
+  const { canvasRef, isModalOpen, setIsModalOpen, target } = useCanvas();
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div>
+      <canvas ref={canvasRef}></canvas>
+      {isModalOpen && target && (
+        <EditModal setIsModalOpen={setIsModalOpen} target={target} />
+      )}
+    </div>
+  );
 }
